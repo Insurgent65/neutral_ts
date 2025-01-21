@@ -1,0 +1,145 @@
+{
+  "config": {
+    "comments": "remove"
+  },
+  "inherit": {
+    "locale": {
+      "current": "es"
+    }
+  },
+  "data": {
+    "site-name": "SiteBrand",
+    "data": {
+      "email": "example@example.com",
+      "phone": "+1234567890",
+      "address": "123 Main St, Cityville, Country",
+      "website_url": "https://www.example.com",
+      "social_media_links": {
+        "facebook": "https://www.facebook.com/example",
+        "twitter": "https://www.twitter.com/example",
+        "instagram": "https://www.instagram.com/example"
+      }
+    },
+    "services": [
+      {
+        "name": "Service 1",
+        "description": "A detailed description of Service 1 that provides comprehensive solutions to your needs.",
+        "price": 100.0,
+        "duration": "2 hours",
+        "features": [
+          "Feature 1",
+          "Feature 2",
+          "Feature 3"
+        ]
+      },
+      {
+        "name": "Service 2",
+        "description": "A detailed description of Service 2 that offers advanced services and support.",
+        "price": 200.0,
+        "duration": "4 hours",
+        "features": [
+          "Feature A",
+          "Feature B",
+          "Feature C"
+        ]
+      },
+      {
+        "name": "Service 3",
+        "description": "A detailed description of Service 3 that specializes in custom solutions.",
+        "price": 150.0,
+        "duration": "3 hours",
+        "features": [
+          "Custom Feature 1",
+          "Custom Feature 2",
+          "Custom Feature 3"
+        ]
+      },
+      {
+        "name": "Service 4",
+        "description": "A detailed description of Service 4 that focuses on maintenance and support.",
+        "price": 50.0,
+        "duration": "1 hour",
+        "features": [
+          "Maintenance Feature 1",
+          "Maintenance Feature 2",
+          "Maintenance Feature 3"
+        ]
+      }
+    ],
+    "products": [
+      {
+        "id": "P001",
+        "name": "Product A",
+        "description": "A high-quality product designed for durability and performance."
+      },
+      {
+        "id": "P002",
+        "name": "Product B",
+        "description": "An innovative product that offers advanced features and functionality."
+      },
+      {
+        "id": "P003",
+        "name": "Product C",
+        "description": "A stylish and practical product suitable for everyday use."
+      },
+      {
+        "id": "P004",
+        "name": "Product D",
+        "description": "An eco-friendly product made from sustainable materials."
+      },
+      {
+        "id": "P005",
+        "name": "Product E",
+        "description": "A luxury product that combines elegance with sophistication."
+      },
+      {
+        "id": "P006",
+        "name": "Product F",
+        "description": "A versatile product ideal for various applications."
+      },
+      {
+        "id": "P007",
+        "name": "Product G",
+        "description": "A durable and reliable product designed to last."
+      },
+      {
+        "id": "P008",
+        "name": "Product H",
+        "description": "An ergonomic product that enhances user comfort."
+      },
+      {
+        "id": "P009",
+        "name": "Product I",
+        "description": "A compact and convenient product for on-the-go use."
+      },
+      {
+        "id": "P010",
+        "name": "Product J",
+        "description": "A cutting-edge product that pushes the boundaries of technology."
+      }
+    ],
+    "about_us": {
+      "mission_statement": "Our mission is to provide high-quality services and exceed your expectations.",
+      "vision_statement": "To be the leading provider of innovative solutions in our industry."
+    },
+    "contact_form": {
+      "fields": [
+        {
+          "name": "Name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "Email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "name": "Message",
+          "type": "textarea",
+          "required": true
+        }
+      ]
+    }
+  }
+}

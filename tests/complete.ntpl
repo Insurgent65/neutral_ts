@@ -1,0 +1,67 @@
+{:*
+    comment
+*:}
+{:include; {:flg; require :} >> tests/snippets.ntpl :}
+{:locale; tests/locale.{:lang;:}.json :}
+{:^;:}<!DOCTYPE html>
+<html lang={:lang;:}>
+<head>
+    <meta charset=UTF-8>
+    <title>Lorem Ipsum {:trans; Test {:;__test-nts:} :}</title>
+</head>
+    <body>
+        <div class="container">
+            <h1>Lorem ipsum {:trans;
+
+                    {:*
+                        comment
+                    *:}
+
+                    Title
+
+            :}</h1>
+            <div>
+                {:code;
+                    {:;__test-nts:} {:;__test-nts-no-def:}
+                :}
+            </div>
+                1:{:;__test-nts:} {:;local::__test-nts:}{:else; none :}
+                {:code; 2:
+                    {:^data; {:flg; require :} >> tests/local-data.json :}
+                    {:code; 3:{:;local::__test-nts:}
+                        {:^data; {:flg; require :} >> tests/local-data.json :}
+                        {:code; 4:{:;local::__test-nts:}
+                            {:^data; {:flg; require :} >> tests/local-data.json :}
+                            {:code; 5:{:;local::__test-nts:}
+                                {:^data; {:flg; require :} >> tests/local-data.json :}
+                                {:code; 6:{:;local::__test-nts:}
+                                    {:^data; {:flg; require :} >> tests/local-data.json :}
+                                6:}
+                            5:}
+                        4:}
+                    3:}
+                2:}
+                1:{:;__test-nts:} {:;local::__test-nts:}{:else; none :}
+            <div>
+                {:^code;
+                    {:data; {:flg; require :} >> tests/local-data.json :}
+                    {:param; array-name >> local::nested-obj :}
+                    {:snippet; iterate-array :}
+                :}
+            </div>
+            <div>
+                {:!allow; traversal >> is not traversal :}{:else; not else :}
+                {:!allow; {:flg; noerror :} traversal >> ../istraversal :}{:else; is traversal! :}
+            </div>
+            <div>
+                {:for; n 0 9 >>
+                    {:*
+                        comment
+                    *:}
+                    {:^;:}
+                    {:trans; num {:;n:} = :} {:;n:}
+                :}
+            </div>
+        </div>
+    </body>
+</html>

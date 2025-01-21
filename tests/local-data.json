@@ -1,0 +1,67 @@
+{
+  "data": {
+    "hello": "local hello",
+    "hello-nts": "{:;__test-nts:}",
+    "__test-nts": "hello data nts",
+    "nested-obj": {
+      "Lorem": {
+        "Ipsum": {
+          "Dolor": {
+            "Sit": {
+              "Amet": "Consectetur adipiscing elit.",
+              "Sed": "Do eiusmod tempor incididunt.",
+              "Ut": "Labore et dolore magna aliqua.",
+              "Array": [
+                "Lorem",
+                "Ipsum",
+                "Dolor"
+              ]
+            },
+            "Enim": {
+              "Ad": "Minim veniam, quis nostrud exercitation.",
+              "Ullamco": "Laboris nisi ut aliquip ex ea commodo consequat.",
+              "Array": [
+                "Sed",
+                "Do",
+                "Eiusmod",
+                "Tempor",
+                "Incididunt"
+              ]
+            }
+          },
+          "Irure": {
+            "Dolor": {
+              "In": "Reprehenderit in voluptate.",
+              "Excepteur": "Sint occaecat cupidatat.",
+              "Array": [
+                "Ut",
+                "Enim",
+                "Ad"
+              ]
+            }
+          }
+        },
+        "Officia": {
+          "Deserunt": {
+            "Mollit": {
+              "Anim": {
+                "Id": "Est laborum et dolorum fugiat nulla pariatur.",
+                "Sed": "Quis nostrud exercitation."
+              }
+            },
+            "Commodo": {
+              "Consequat": "Duis aute irure dolor in reprehenderit.",
+              "Array": [
+                "Amet",
+                "Sed",
+                "Do",
+                "Eiusmod",
+                "Tempor"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

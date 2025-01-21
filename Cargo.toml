@@ -1,0 +1,23 @@
+[package]
+name = "neutralts"
+description = "Neutral is a web application template system, designed to work with any programming language via IPC and natively as an IPC or library/crate in Rust."
+license = "Apache-2.0"
+version = "0.0.0-dev"
+edition = "2021"
+repository = "https://gitlab.com/neutralfw/neutralts"
+documentation = "https://docs.rs/neutralts/latest/neutralts/"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
+num-format = "0.4"
+regex = "1.5.4"
+validator = { version = "0.16", features = ["derive"] }
+html-escape = "0.2"
+indexmap = {version = "2.0.0", features = ["serde"]}
+textwrap = "0.14"
+chrono = "0.4"
+md-5 = "0.10"
+rand = "0.8"
+sha2 = "0.10"
+lazy_static = "1.5.0"
