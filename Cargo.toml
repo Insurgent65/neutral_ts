@@ -2,7 +2,7 @@
 name = "neutralts"
 description = "Neutral is a web application template system, designed to work with any programming language via IPC and natively as an IPC or library/crate in Rust."
 license = "Apache-2.0"
-version = "0.0.0-dev"
+version = "0.0.1-dev"
 edition = "2021"
 repository = "https://gitlab.com/neutralfw/neutralts"
 documentation = "https://docs.rs/neutralts/latest/neutralts/"
