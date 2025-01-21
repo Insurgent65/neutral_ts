@@ -1,4 +1,4 @@
 **/target
 /pruebas
 .directory
-/examples
+/src/main.rs

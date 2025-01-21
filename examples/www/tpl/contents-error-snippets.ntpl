@@ -1,0 +1,21 @@
+{:*
+    Error contents
+*:}
+
+{:*
+    Contents
+*:}
+{:snippet; theme-contents >>
+            {:^;:} {:* <-- unnecessary, just for nice output *:}
+            <div class="page-header" id="title">
+                <div class="row text-center">
+                    <h1>{:trans; {:;error->text:} :}</h1>
+                    <div style="font-size: 100px;">{:;error->code:}</div>
+                </div>
+            </div>
+:}
+
+{:*
+    Foofer (none)
+*:}
+{:snippet; theme-footer >> :}

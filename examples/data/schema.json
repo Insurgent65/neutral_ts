@@ -1,0 +1,109 @@
+{
+  "config": {
+    "comments": "remove"
+  },
+  "inherit": {
+    "locale": {
+      "current": "de",
+      "trans": {
+        "en": {
+          "ref-locale-en": "English",
+          "ref-locale-es": "Español",
+          "ref-locale-de": "Deutsch",
+          "ref-locale-fr": "Français",
+          "ref-locale-xx": "Klingon"
+        },
+        "es": {
+          "ref-locale-en": "English",
+          "ref-locale-es": "Español",
+          "ref-locale-de": "Deutsch",
+          "ref-locale-fr": "Français",
+          "ref-locale-xx": "Klingon"
+        },
+        "fr": {
+          "ref-locale-en": "English",
+          "ref-locale-es": "Español",
+          "ref-locale-de": "Deutsch",
+          "ref-locale-fr": "Français",
+          "ref-locale-xx": "Klingon"
+        },
+        "de": {
+          "ref-locale-en": "English",
+          "ref-locale-es": "Español",
+          "ref-locale-de": "Deutsch",
+          "ref-locale-fr": "Français",
+          "ref-locale-xx": "Klingon"
+        },
+        "xx": {
+          "ref-locale-en": "English",
+          "ref-locale-es": "Español",
+          "ref-locale-de": "Deutsch",
+          "ref-locale-fr": "Français",
+          "ref-locale-xx": "Klingon"
+        }
+      }
+    }
+  },
+  "data": {
+    "current-fw": "",
+    "frameworks": {
+      "actix-web": {
+        "title": "{:neutral; example >> actix-web :}"
+      },
+      "axum": {
+        "title": "{:neutral; example >> axum :}"
+      },
+      "rocket": {
+        "title": "{:neutral; example >> rocket :}"
+      },
+      "warp": {
+        "title": "{:neutral; example >> warp :}"
+      }
+    },
+    "class-color": "red",
+    "site": {
+      "name": "{:;:}",
+      "title": "{:neutral; template systen >> example :}",
+      "_title": "Neutral Template System example",
+      "description": "A simple example of using Neutral Template System with html and different themes",
+      "meta": {
+        "author": "Neutral Template System",
+        "generator": "neutralts"
+      },
+      "themes": [
+        "sketchy",
+        "cerulean",
+        "cosmo",
+        "cyborg",
+        "darkly",
+        "flatly",
+        "journal",
+        "litera",
+        "lumen",
+        "lux",
+        "materia",
+        "minty",
+        "morph",
+        "pulse",
+        "quartz",
+        "sandstone",
+        "simplex",
+        "slate",
+        "solar",
+        "spacelab",
+        "superhero",
+        "united",
+        "vapor",
+        "yeti",
+        "zephyr"
+      ],
+      "languages": [
+        "en",
+        "es",
+        "de",
+        "fr",
+        "xx"
+      ]
+    }
+  }
+}

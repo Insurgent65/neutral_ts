@@ -1,0 +1,54 @@
+{:*
+    home contents
+*:}
+
+{:*
+    Error 403 when the theme is not one of the accepted ones.
+*:}
+{:eval;
+    {:allow; themes >>
+        {:;site->theme:}
+    :}{:else;
+        {:exit; 403 :}
+    :}
+    >>
+:}
+
+{:*
+    Contents for Home
+*:}
+{:snippet; theme-contents >>
+            {:^;:} {:* <-- unnecessary, just for nice output *:}
+            <div class="page-header" id="title">
+                <div class="row">
+                    <h1>{:trans;
+
+                            {:*
+                                We can include comments anywhere and include whitespaces,
+                                the text will be translated and placed correctly.
+                            *:}
+                            {:;frameworks->{:;current-fw:}->title:}
+
+                    :}</h1>
+                    <p class="lead">{:trans; {:;site->description:} :}</p>
+                </div>
+            </div>
+            <div class="page-content" id="content">
+                <div class="row">
+                    <div class="mt-3">
+                        <h4>README.md</h4>
+                        <div class="border border-1 my-4">
+                            <pre class="border-0 m-0 p-0"><code class="px-4 py-3 language-markdown" style="white-space: pre-wrap; background-color: #FaFaFa;">
+                                {:^include; {:flg; safe :} >> #/../../README.md :}
+                            </code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+:}
+
+{:*
+    Foofer
+
+    The theme-footer snippet is left unset to load the default one.
+*:}

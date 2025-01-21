@@ -1,0 +1,18 @@
+{:*
+    Errors
+*:}
+
+{:*
+    Include generic and defaults snippets
+*:}
+{:!include; {:flg; require :} >> #/snippets.ntpl :}
+
+{:*
+    Sets the content for error
+*:}
+{:include; #/contents-error-snippets.ntpl :}
+
+{:*
+    Render theme
+*:}
+{:include; {:flg; require :} >> #/template.ntpl :}

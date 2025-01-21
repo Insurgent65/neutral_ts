@@ -1,0 +1,44 @@
+{:*
+    Load user language
+
+    In a small application, it is not a problem to load all the available
+    languages, in a larger one it would be a waste of resources, here we
+    load only the translations of the user's language.
+*:}
+{:!locale; #/../locale/trans.{:snippet; lang :}.json :}
+
+{:*
+    Include generic and defaults snippets
+*:}
+{:!include; {:flg; require :} >> #/snippets.ntpl :}
+
+{:*
+    The bif {:^;:} is simply to keep <!DOCTYPE html> at the beginning.
+*:}
+{:^;:}<!DOCTYPE html>
+<html lang="{:snippet; lang :}">
+    <head>
+        <title>{:trans; {:;site->title:} :}</title>
+        <meta name="description" content="{:trans; {:;site->description:} :}">
+        {:each; site->meta name content >>
+        {:^;:} {:* <-- unnecessary, just for nice output *:}
+        <meta name="{:;name:}" content="{:;content:}">
+        :}
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf8">
+    {:snippet; current-css-theme :}
+    {:snippet; bootswatch-css-custom :}
+    {:snippet; dynamic-css :}
+    {:snippet; dynamic-js :}
+    </head>
+    <body>
+        {:snippet; theme-navbar :}
+        <div class="container">
+            {:snippet; theme-contents :}
+            {:snippet; theme-footer :}
+        </div>
+        {:snippet; set-cookies :}
+        {:snippet; current-js-theme :}
+        {:snippet; highlight-js :}
+    </body>
+</html>
