@@ -949,7 +949,7 @@ dependencies = [
 
 [[package]]
 name = "neutralts"
-version = "0.0.0-dev"
+version = "0.0.2-dev"
 dependencies = [
  "chrono",
  "html-escape",
