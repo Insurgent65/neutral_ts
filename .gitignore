@@ -2,7 +2,6 @@
 /pruebas
 .directory
 /src/main.rs
-
 /examples/actix/Cargo.lock
 /examples/axum/Cargo.lock
 /examples/rocket/Cargo.lock
