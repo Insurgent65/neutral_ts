@@ -16,6 +16,12 @@
 :}
 
 {:*
-    Foofer (none)
+    Disabled
 *:}
 {:snippet; theme-footer >> :}
+
+{:snippet; menu-themes >> :}
+
+{:snippet; menu-lang >> :}
+
+{:snippet; menu-error >> :}

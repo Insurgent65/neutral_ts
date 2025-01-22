@@ -156,10 +156,12 @@
 
 {:declare; fw-theme-supported >>
     actix-web
+    rocket
 :}
 
 {:declare; fw-lang-supported >>
     actix-web
+    rocket
 :}
 
 {:*
@@ -178,13 +180,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/">{:trans; Home :}</a>
                         </li>
-                        <li class="nav-item dropdown" data-bs-theme="light">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="language">{:trans; Error :}</a>
-                            <div class="dropdown-menu dropdown-menu">
-                                <a class="dropdown-item" href="/?theme=fake">403</a>
-                                <a class="dropdown-item" href="/non-existent-page">404</a>
-                            </div>
-                        </li>
+                        {:snippet; menu-error :}
                         {:snippet; menu-themes :}
                     </ul>
                     <ul class="d-flex navbar-nav ms-md-auto">
@@ -221,4 +217,14 @@
                             </div>
                         </li>
     :}
+:}
+
+{:snippet; menu-error >>
+                        <li class="nav-item dropdown" data-bs-theme="light">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="language">{:trans; Error :}</a>
+                            <div class="dropdown-menu dropdown-menu">
+                                <a class="dropdown-item" href="/?theme=fake">403</a>
+                                <a class="dropdown-item" href="/non-existent-page">404</a>
+                            </div>
+                        </li>
 :}

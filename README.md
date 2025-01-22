@@ -309,3 +309,11 @@ let status_param = template.get_status_param();
 
 // act accordingly at this point according to your framework
 ```
+
+Rust examples
+-------------
+
+ - [actix-web](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/actix)
+ - [axum](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/actix)
+ - [rocket](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/actix)
+ - [examples](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples)
