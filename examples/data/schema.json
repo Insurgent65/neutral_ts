@@ -4,7 +4,7 @@
   },
   "inherit": {
     "locale": {
-      "current": "de",
+      "current": "en",
       "trans": {
         "en": {
           "ref-locale-en": "English",
