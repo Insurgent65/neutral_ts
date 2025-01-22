@@ -6,7 +6,7 @@ version = "0.0.2-dev"
 edition = "2021"
 repository = "https://gitlab.com/neutralfw/neutralts"
 documentation = "https://docs.rs/neutralts/latest/neutralts/"
-keywords = ["web template", "web-apps", "template", "html", "web"]
+keywords = ["web", "template", "templating", "engine", "html"]
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
