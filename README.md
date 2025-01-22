@@ -315,5 +315,5 @@ Rust examples
 
  - [actix-web](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/actix)
  - [axum](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/actix)
- - [rocket](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/actix)
+ - [rocket](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/rocket)
  - [examples](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples)
