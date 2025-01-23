@@ -3,8 +3,6 @@ Neutral Web Template System
 
 Neutral is a **web application template system**, designed to work with **any programming language** via IPC and natively as an IPC or library/crate in Rust.
 
-(*) Currently, the IPC is not implemented and can be used natively in Rust in any framework.
-
 Safe
 ----
 

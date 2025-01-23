@@ -49,6 +49,10 @@ Modifiers:
 {:^allow; ... :}
 ```
 
+### Modifier: ^ (upline)
+
+Eliminates previous whitespaces, (See "unprintable" for examples.)
+
 ### Modifier: ! (not)
 
 Output of an empty string in case it is found in the "declare".

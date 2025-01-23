@@ -1,7 +1,9 @@
+![neutral](doc/top-neutralts.png)
+
 Neutral Web Template System
 ===========================
 
-Neutral is a **web application template system**, designed to work with **any programming language** via IPC and natively as an IPC or library/crate in Rust.
+Neutral is a **web application template system**, designed to work with **any programming language** (language-agnostic) via IPC and natively as library/crate in Rust. Pemite crear plantillas ejecutables en cualquier sistema con cualquier lenguaje.
 
 (*) Currently, the IPC is not implemented and can be used natively in Rust in any framework.
 
@@ -20,6 +22,24 @@ It is NOT possible:
 * Logical operator: varname == varname
 * Mathematical operators: varname + varname
 * Assignment operators: varname = 1
+
+Features
+--------
+
+It allows you to create templates compatible with any system and any programming language.
+
+* Safe
+* Language-agnostic
+* Modular
+* Parameterizable
+* Parse files
+* Embed files
+* Localization
+* Loops: for and each
+* Snippets
+* Nesting, grouping and wrapping
+* Redirections: HTTP y JavaScript
+* Comments
 
 Localization
 ------------
@@ -59,7 +79,6 @@ Now you can use:
 ```neutral
 {:trans; Hello :}
 ```
-
 
 Actually you can always use "trans" because if there is no translation it returns the text.
 

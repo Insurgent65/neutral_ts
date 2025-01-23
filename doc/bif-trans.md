@@ -15,10 +15,13 @@ Modifiers
 {:!trans; ... :}
 {:^!trans; ... :}
 ```
+### Modifier: ^ (upline)
+
+Eliminates previous whitespaces
 
 Assuming that the translation of Hello is Hello:
 
-```html
+```texplain
 <div></div>
 
 {:trans; Hello :}
@@ -30,13 +33,15 @@ Assuming that the translation of Hello is Hello:
 
 Output:
 
-```html
+```texplain
 <div></div>
 
 Hello
 
 <div></div>Hello
 ```
+
+### Modifier: ! (not)
 
 By default the same string is output if there is no translation, to output an empty string use the modifier "not". Assuming there is no translation for "Hello".
 

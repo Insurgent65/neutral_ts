@@ -15,7 +15,11 @@ Modifiers:
 {:^bool; varname >> ... :}
 ```
 
-Modifier ! (not):
+### Modifier: ^ (upline)
+
+Eliminates previous whitespaces, (See "unprintable" for examples.)
+
+### Modifier: ! (not):
 
 ```html
 {:!bool; varname >> this shown if varname is false :}

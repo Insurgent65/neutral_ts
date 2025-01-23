@@ -7,18 +7,68 @@ Output empty string, eliminates or preserves spaces.
 {:;:}
 ```
 
-Modifiers:
+Modifiers
+---------
 
 ```html
 {:^;:}
 ```
 
+### Modifier: ^ (upline)
+
+Eliminates **previous** whitespaces.
+
+Assuming varname = Hello:
+
+```texplain
+<div></div>
+
+{:;varname:}
+
+<div></div>
+
+{:^;:}{:;varname:}
+```
+
+Output:
+
+```texplain
+<div></div>
+
+Hello
+
+<div></div>Hello
+```
+
+Assuming varname = Hello:
+
+```texplain
+-|
+{:;:}
+
+{:^;:}{:;varname:}
+-|
+
+{:^;:}{:;varname:}
+```
+
+Output:
+
+```texplain
+-|
+Hello
+-|Hello
+```
+
 No flags
 --------
 
+Usage
+-----
+
 The following are the same:
 
-```html
+```textplain
 <div>{:;:}</div>
 <div>{:; :}</div>
 <div>{:;     :}</div>
@@ -29,7 +79,7 @@ The following are the same:
 
 Output:
 
-```html
+```textplain
 <div></div>
 <div></div>
 <div></div>
@@ -38,7 +88,7 @@ Output:
 
 The usual behavior in output is as expected in practically all cases, the following produce the same output:
 
-```html
+```textplain
 <div>{:code;Hello:}</div>
 <div>{:code; Hello :}</div>
 <div>{:code;
@@ -50,7 +100,7 @@ The usual behavior in output is as expected in practically all cases, the follow
 
 Output:
 
-```html
+```textplain
 <div>Hello</div>
 <div>Hello</div>
 <div>Hello</div>
@@ -58,7 +108,7 @@ Output:
 
 But in special cases we may need to make it so that spaces or carriage returns are not removed. And this is the main use of unprintable Bif:
 
-```html
+```textplain
 <pre>
 {:code;
     {:^;:}
@@ -70,7 +120,7 @@ But in special cases we may need to make it so that spaces or carriage returns a
 
 Output:
 
-```html
+```textplain
 <pre>
     Hello
 </pre>
@@ -78,23 +128,39 @@ Output:
 
 Preserve space:
 
-```html
-<div>{:code; Hello :}</div>
+```textplain
+<div>{:code;   Hello   :}</div>
 <div>{:code; {:;:} Hello :}</div>
 <div> {:code; Hello :}</div>
 ```
 
 Output:
 
-```html
+```textplain
 <div>Hello</div>
 <div> Hello</div>
 <div> Hello</div>
 ```
 
+
+In the previous example:
+
+```textplain
+                  .--- preserve
+                  |
+                  v
+<div>{:code; {:;:} Hello :}</div>
+
+                  .--- preserve two
+                  ||
+                  vv
+<div>{:code; {:;:}  Hello :}</div>
+```
+
+
 Not preserve spaces:
 
-```html
+```textplain
 <div>
     {:code;
         Hello
@@ -109,7 +175,7 @@ Not preserve spaces:
 
 Output:
 
-```html
+```textplain
 <div>
     Hello
 </div>
