@@ -19,6 +19,10 @@ Modifiers:
 
 For more details about the "+" modifier see "modifiers".
 
+### Modifier: ^ (upline)
+
+Eliminates previous whitespaces, (See "unprintable" for examples.)
+
 Flags
 -----
 

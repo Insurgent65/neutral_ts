@@ -39,6 +39,7 @@ It allows you to create templates compatible with any system and any programming
 * Snippets
 * Nesting, grouping and wrapping
 * Redirections: HTTP y JavaScript
+* Exit with error: 403, 404, 503, ...
 * Comments
 
 Localization
