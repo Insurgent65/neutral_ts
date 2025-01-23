@@ -22,3 +22,6 @@ md-5 = "0.10"
 rand = "0.8"
 sha2 = "0.10"
 lazy_static = "1.5.0"
+
+[build]
+exclude = ["ipc"]
