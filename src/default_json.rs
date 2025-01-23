@@ -7,9 +7,9 @@ pub const DEFAULT: &str =r#"{
         "_comment_:comments": "keep|remove, default or empty keep",
         "comments": "keep",
         "_comment_:errors": "show|hide, default or empty show",
-        "errors": "show",
-        "_comment_:error_log": "directory to log, empty no error to file",
-        "error_log": "",
+        "error": {
+            "show": true
+        },
         "cache_prefix": "domain",
         "cache_dir": "/tmp",
         "working_dir": ""

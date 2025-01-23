@@ -349,11 +349,17 @@ impl<'a> Template<'a> {
     pub fn from_file_value(file_path: &'a str, schema: Value) -> Result<Self, String> {
         let raw: String = match fs::read_to_string(file_path) {
             Ok(s) => s,
-            Err(e) => return Err(e.to_string()),
+            Err(e) => {
+                eprintln!("Cannot be read: {}", file_path);
+                return Err(e.to_string());
+            }
         };
         let mut default_schema: Value = match serde_json::from_str(DEFAULT) {
             Ok(value) => value,
-            Err(_) => return Err("const DEFAULT is not a valid JSON string".to_string()),
+            Err(_) => {
+                eprintln!("Internal error in const DEFAULT {}, line: {}", file!(), line!());
+                return Err("const DEFAULT is not a valid JSON string".to_string());
+            }
         };
 
         merge_schema(&mut default_schema, &schema);
@@ -383,7 +389,10 @@ impl<'a> Template<'a> {
         self.file_path = file_path;
         self.raw = match fs::read_to_string(file_path) {
             Ok(s) => s,
-            Err(e) => return Err(e.to_string()),
+            Err(e) => {
+                eprintln!("Cannot be read: {}", file_path);
+                return Err(e.to_string());
+            }
         };
 
         Ok(())
@@ -412,11 +421,17 @@ impl<'a> Template<'a> {
     pub fn merge_schema_path(&mut self, schema_path: &str) -> Result<(), String> {
         let schema_str: String = match fs::read_to_string(schema_path) {
             Ok(s) => s,
-            Err(e) => return Err(e.to_string()),
+            Err(e) => {
+                eprintln!("Cannot be read: {}", schema_path);
+                return Err(e.to_string());
+            }
         };
         let schema_value: Value = match serde_json::from_str(&schema_str) {
             Ok(value) => value,
-            Err(_) => return Err("const DEFAULT is not a valid JSON string".to_string()),
+            Err(_) => {
+                eprintln!("Internal error in const DEFAULT {}, line: {}", file!(), line!());
+                return Err("const DEFAULT is not a valid JSON string".to_string());
+            }
         };
         merge_schema(&mut self.schema, &schema_value);
 
@@ -436,7 +451,10 @@ impl<'a> Template<'a> {
     pub fn merge_schema_str(&mut self, schema: &str) -> Result<(), String> {
         let schema_value: Value = match serde_json::from_str(&schema) {
             Ok(value) => value,
-            Err(_) => return Err("const DEFAULT is not a valid JSON string".to_string()),
+            Err(_) => {
+                eprintln!("Internal error in const DEFAULT {}, line: {}", file!(), line!());
+                return Err("const DEFAULT is not a valid JSON string".to_string());
+            }
         };
         merge_schema(&mut self.schema, &schema_value);
 
@@ -625,9 +643,14 @@ impl<'a> Template<'a> {
         self.shared.has_error
     }
 
-    // fn get_error(&self) -> String {
-    //     EMPTY_STRING
-    // }
+    /// Get bifs errors list
+    ///
+    /// # Returns
+    ///
+    /// * `Value`: A clone of the value with the list of errors in the bifs during rendering.
+    pub fn get_error(&self) -> Value {
+        self.shared.schema["__error"].clone()
+    }
 
     /// Retrieves the time duration for template rendering.
     ///
@@ -686,6 +709,7 @@ impl<'a> BlockParser<'a> {
             Err(p) => {
                 self.shared.status_code = "500".to_string();
                 self.shared.status_param = format!("Unmatched block at position {}", p);
+                eprintln!("Unmatched block at position {}", p);
 
                 if let Some(text) = STATUS_CODES.get(self.shared.status_code.as_str()) {
                     self.shared.status_text = text.to_string();
@@ -793,7 +817,21 @@ impl<'a> Bif<'a> {
                 self.src = src.trim().to_string();
             }
         } else {
-            println!("ERROR: El delimitador no fue encontrado: {}", self.raw);
+            let show_error = self.shared.schema["config"]["error"]["show"].as_bool().unwrap();
+            let error_line = format!("The delimiter was not found: {}", self.raw);
+            let error_line = error_line.replace(|c: char| c == '\n' || c == '\r', " ");
+
+            if let Some(Value::Array(ref mut errors)) = self.shared.schema.get_mut("__error") {
+                errors.push(json!(error_line));
+            }
+
+            if show_error {
+                eprintln!("{}", error_line);
+            }
+
+            self.shared.has_error = true;
+
+            return EMPTY_STRING;
         }
         self.name = self.set_modifiers();
         self.alias = self.name.clone();
@@ -836,15 +874,16 @@ impl<'a> Bif<'a> {
         match result {
             Ok(()) => (),
             Err(e) => {
-                let show_error = get_from_key(&self.shared.schema["config"], "errors");
-                let error_line = format!("Error {} {} in:{} {}", e.code, e.msg, e.name, e.src);
+                let show_error = self.shared.schema["config"]["error"]["show"].as_bool().unwrap();
+                let error_line = format!("Error {} ({}) {}  src: {}", e.code, e.name, e.msg, e.src);
+                let error_line = error_line.replace(|c: char| c == '\n' || c == '\r', " ");
 
                 if let Some(Value::Array(ref mut errors)) = self.shared.schema.get_mut("__error") {
                     errors.push(json!(error_line));
                 }
 
-                if !show_error.contains("hide") {
-                    println!("{}", error_line);
+                if show_error {
+                    eprintln!("{}", error_line);
                 }
 
                 self.shared.has_error = true;
@@ -1019,7 +1058,7 @@ impl<'a> Bif<'a> {
         self.alias = "unknown".to_string();
 
         Err(BifError {
-            code: 10,
+            code: 101,
             msg: "unknown bif".to_string(),
             name: self.alias.clone(),
             src: self.raw.to_string(),
@@ -1033,7 +1072,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_var(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 102,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1060,7 +1099,7 @@ impl<'a> Bif<'a> {
                 self.out = EMPTY_STRING;
 
                 return Err(BifError {
-                    code: 10,
+                    code: 103,
                     msg: "insecure varname".to_string(),
                     name: self.alias.clone(),
                     src: self.src.clone(),
@@ -1085,7 +1124,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_allow(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 104,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1101,7 +1140,7 @@ impl<'a> Bif<'a> {
 
         if words_string.is_empty() {
             return Err(BifError {
-                code: 10,
+                code: 105,
                 msg: self.params.clone() + " declared is empty",
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1155,7 +1194,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_array(&mut self) -> Result<(), BifError> {
         if self.mod_filter {
             return Err(BifError {
-                code: 10,
+                code: 106,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1180,7 +1219,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_bool(&mut self) -> Result<(), BifError> {
         if self.mod_filter {
             return Err(BifError {
-                code: 10,
+                code: 107,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1209,7 +1248,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_coalesce(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate {
             return Err(BifError {
-                code: 10,
+                code: 108,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1230,7 +1269,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_code(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate {
             return Err(BifError {
-                code: 10,
+                code: 109,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1276,7 +1315,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_count(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 110,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1295,7 +1334,7 @@ impl<'a> Bif<'a> {
                 Ok(num) => num,
                 Err(_) => {
                     return Err(BifError {
-                        code: 10,
+                        code: 111,
                         msg: "argument is not a number".to_string(),
                         name: self.alias.clone(),
                         src: self.raw.to_string(),
@@ -1311,7 +1350,7 @@ impl<'a> Bif<'a> {
                 Ok(num) => num,
                 Err(_) => {
                     return Err(BifError {
-                        code: 10,
+                        code: 112,
                         msg: "argument is not a number".to_string(),
                         name: self.alias.clone(),
                         src: self.raw.to_string(),
@@ -1333,7 +1372,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_data(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 113,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1347,7 +1386,7 @@ impl<'a> Bif<'a> {
         if self.file_path.contains(BIF_OPEN) {
             if !self.contains_allow(&self.file_path) {
                 return Err(BifError {
-                    code: 10,
+                    code: 114,
                     msg: "insecure file name".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -1365,7 +1404,7 @@ impl<'a> Bif<'a> {
         if !Path::new(path).exists() {
             if self.flags.contains("|require|") {
                 return Err(BifError {
-                    code: 10,
+                    code: 115,
                     msg: "file not found".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -1404,7 +1443,7 @@ impl<'a> Bif<'a> {
             Ok(value) => value,
             Err(_) => {
                 return Err(BifError {
-                    code: 10,
+                    code: 116,
                     msg: "not a valid JSON file".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -1432,7 +1471,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_date(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 117,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1464,7 +1503,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_declare(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 118,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1485,7 +1524,7 @@ impl<'a> Bif<'a> {
             self.out = EMPTY_STRING;
         } else {
             return Err(BifError {
-                code: 10,
+                code: 119,
                 msg: "declare cannot be set here".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1501,7 +1540,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_defined(&mut self) -> Result<(), BifError> {
         if self.mod_filter {
             return Err(BifError {
-                code: 10,
+                code: 120,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1528,7 +1567,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_each(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 121,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1542,7 +1581,7 @@ impl<'a> Bif<'a> {
             Some(value) => value.to_string(),
             None => {
                 return Err(BifError {
-                    code: 10,
+                    code: 122,
                     msg: "arguments not found".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -1554,7 +1593,7 @@ impl<'a> Bif<'a> {
             Some(value) => value.to_string(),
             None => {
                 return Err(BifError {
-                    code: 10,
+                    code: 123,
                     msg: "arguments 'key' not found".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -1566,7 +1605,7 @@ impl<'a> Bif<'a> {
             Some(value) => value.to_string(),
             None => {
                 return Err(BifError {
-                    code: 10,
+                    code: 124,
                     msg: "arguments 'value' not found".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -1623,7 +1662,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_else(&mut self) -> Result<(), BifError> {
         if self.mod_filter {
             return Err(BifError {
-                code: 10,
+                code: 125,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1653,7 +1692,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_eval(&mut self) -> Result<(), BifError> {
         if self.mod_filter {
             return Err(BifError {
-                code: 10,
+                code: 126,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1690,7 +1729,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_exit(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 127,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1741,7 +1780,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_filled(&mut self) -> Result<(), BifError> {
         if self.mod_filter {
             return Err(BifError {
-                code: 10,
+                code: 128,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1768,7 +1807,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_flg(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_upline || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 129,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1796,7 +1835,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_for(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 130,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1811,7 +1850,7 @@ impl<'a> Bif<'a> {
             Some(value) => value.to_string(),
             None => {
                 return Err(BifError {
-                    code: 10,
+                    code: 131,
                     msg: "arguments not found".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -1824,7 +1863,7 @@ impl<'a> Bif<'a> {
                 Ok(num) => num,
                 Err(_) => {
                     return Err(BifError {
-                        code: 10,
+                        code: 132,
                         msg: "argument is not a number".to_string(),
                         name: self.alias.clone(),
                         src: self.raw.to_string(),
@@ -1833,7 +1872,7 @@ impl<'a> Bif<'a> {
             },
             None => {
                 return Err(BifError {
-                    code: 10,
+                    code: 133,
                     msg: "arguments 'from' and 'to' not found".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -1846,7 +1885,7 @@ impl<'a> Bif<'a> {
                 Ok(num) => num,
                 Err(_) => {
                     return Err(BifError {
-                        code: 10,
+                        code: 134,
                         msg: "argument is not a number".to_string(),
                         name: self.alias.clone(),
                         src: self.raw.to_string(),
@@ -1855,7 +1894,7 @@ impl<'a> Bif<'a> {
             },
             None => {
                 return Err(BifError {
-                    code: 10,
+                    code: 135,
                     msg: "arguments 'to' not found".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -1886,7 +1925,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_hash(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 136,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1923,7 +1962,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_include(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 137,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -1937,7 +1976,7 @@ impl<'a> Bif<'a> {
         if self.file_path.contains(BIF_OPEN) {
             if !self.contains_allow(&self.file_path) {
                 return Err(BifError {
-                    code: 10,
+                    code: 138,
                     msg: "insecure file name".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -1955,7 +1994,7 @@ impl<'a> Bif<'a> {
         if !path.exists() {
             if self.flags.contains("|require|") {
                 return Err(BifError {
-                    code: 10,
+                    code: 139,
                     msg: "file not found".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -2017,7 +2056,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_lang(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 140,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -2035,7 +2074,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_locale(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 141,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -2054,7 +2093,7 @@ impl<'a> Bif<'a> {
                 Ok(value) => value,
                 Err(_) => {
                     return Err(BifError {
-                        code: 10,
+                        code: 142,
                         msg: "not a valid JSON string".to_string(),
                         name: self.alias.clone(),
                         src: self.raw.to_string(),
@@ -2078,7 +2117,7 @@ impl<'a> Bif<'a> {
         if self.file_path.contains(BIF_OPEN) {
             if !self.contains_allow(&self.file_path) {
                 return Err(BifError {
-                    code: 10,
+                    code: 143,
                     msg: "insecure file name".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -2096,7 +2135,7 @@ impl<'a> Bif<'a> {
         if !Path::new(path).exists() {
             if self.flags.contains("|require|") {
                 return Err(BifError {
-                    code: 10,
+                    code: 144,
                     msg: "file not found".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -2132,7 +2171,7 @@ impl<'a> Bif<'a> {
             Ok(value) => value,
             Err(_) => {
                 return Err(BifError {
-                    code: 10,
+                    code: 145,
                     msg: "not a valid JSON file".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -2157,7 +2196,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_moveto(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 146,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -2190,7 +2229,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_neutral(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 147,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -2212,7 +2251,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_param(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 148,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -2234,7 +2273,7 @@ impl<'a> Bif<'a> {
                 return Ok(());
             } else {
                 return Err(BifError {
-                    code: 10,
+                    code: 149,
                     msg: "param cannot be set here".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -2262,7 +2301,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_rand(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 150,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -2290,7 +2329,7 @@ impl<'a> Bif<'a> {
                     Ok(num) => num,
                     Err(_) => {
                         return Err(BifError {
-                            code: 10,
+                            code: 151,
                             msg: "argument is not a number".to_string(),
                             name: self.alias.clone(),
                             src: self.raw.to_string(),
@@ -2299,7 +2338,7 @@ impl<'a> Bif<'a> {
                 },
                 None => {
                     return Err(BifError {
-                        code: 10,
+                        code: 152,
                         msg: "arguments not found".to_string(),
                         name: self.alias.clone(),
                         src: self.raw.to_string(),
@@ -2312,7 +2351,7 @@ impl<'a> Bif<'a> {
                     Ok(num) => num,
                     Err(_) => {
                         return Err(BifError {
-                            code: 10,
+                            code: 153,
                             msg: "argument is not a number".to_string(),
                             name: self.alias.clone(),
                             src: self.raw.to_string(),
@@ -2321,7 +2360,7 @@ impl<'a> Bif<'a> {
                 },
                 None => {
                     return Err(BifError {
-                        code: 10,
+                        code: 154,
                         msg: "arguments not found".to_string(),
                         name: self.alias.clone(),
                         src: self.raw.to_string(),
@@ -2331,7 +2370,7 @@ impl<'a> Bif<'a> {
 
             if from > to {
                 return Err(BifError {
-                    code: 10,
+                    code: 155,
                     msg: "from > to".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -2351,7 +2390,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_redirect(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_scope || self.mod_negate {
             return Err(BifError {
-                code: 10,
+                code: 156,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -2371,7 +2410,7 @@ impl<'a> Bif<'a> {
                 "301" => {
                     if self.code.is_empty() {
                         return Err(BifError {
-                            code: 10,
+                            code: 157,
                             msg: "this redirection requires URL".to_string(),
                             name: self.alias.clone(),
                             src: self.raw.to_string(),
@@ -2383,7 +2422,7 @@ impl<'a> Bif<'a> {
                 "302" => {
                     if self.code.is_empty() {
                         return Err(BifError {
-                            code: 10,
+                            code: 158,
                             msg: "this redirection requires URL".to_string(),
                             name: self.alias.clone(),
                             src: self.raw.to_string(),
@@ -2395,7 +2434,7 @@ impl<'a> Bif<'a> {
                 "303" => {
                     if self.code.is_empty() {
                         return Err(BifError {
-                            code: 10,
+                            code: 159,
                             msg: "this redirection requires URL".to_string(),
                             name: self.alias.clone(),
                             src: self.raw.to_string(),
@@ -2407,7 +2446,7 @@ impl<'a> Bif<'a> {
                 "307" => {
                     if self.code.is_empty() {
                         return Err(BifError {
-                            code: 10,
+                            code: 160,
                             msg: "this redirection requires URL".to_string(),
                             name: self.alias.clone(),
                             src: self.raw.to_string(),
@@ -2419,7 +2458,7 @@ impl<'a> Bif<'a> {
                 "308" => {
                     if self.code.is_empty() {
                         return Err(BifError {
-                            code: 10,
+                            code: 161,
                             msg: "this redirection requires URL".to_string(),
                             name: self.alias.clone(),
                             src: self.raw.to_string(),
@@ -2441,7 +2480,7 @@ impl<'a> Bif<'a> {
                 "js:redirect:top" => {
                     if self.code.is_empty() {
                         return Err(BifError {
-                            code: 10,
+                            code: 162,
                             msg: "this redirection requires URL".to_string(),
                             name: self.alias.clone(),
                             src: self.raw.to_string(),
@@ -2456,7 +2495,7 @@ impl<'a> Bif<'a> {
                 "js:redirect:self" => {
                     if self.code.is_empty() {
                         return Err(BifError {
-                            code: 10,
+                            code: 163,
                             msg: "this redirection requires URL".to_string(),
                             name: self.alias.clone(),
                             src: self.raw.to_string(),
@@ -2473,7 +2512,7 @@ impl<'a> Bif<'a> {
                     if !self.code.contains("js:reload:self") || !self.code.contains("js:reload:top")
                     {
                         return Err(BifError {
-                            code: 10,
+                            code: 164,
                             msg: "status code not allowed".to_string(),
                             name: self.alias.clone(),
                             src: self.raw.to_string(),
@@ -2498,7 +2537,7 @@ impl<'a> Bif<'a> {
                 }
                 _ => {
                     return Err(BifError {
-                        code: 10,
+                        code: 165,
                         msg: "redirect type not allowed".to_string(),
                         name: self.alias.clone(),
                         src: self.raw.to_string(),
@@ -2529,7 +2568,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_replace(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 166,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -2543,7 +2582,7 @@ impl<'a> Bif<'a> {
             delim = first_char;
         } else {
             return Err(BifError {
-                code: 10,
+                code: 167,
                 msg: "missing arguments".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -2559,7 +2598,7 @@ impl<'a> Bif<'a> {
             Some(value) => value.to_string(),
             None => {
                 return Err(BifError {
-                    code: 10,
+                    code: 168,
                     msg: "arguments not found".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -2571,7 +2610,7 @@ impl<'a> Bif<'a> {
             Some(value) => value.to_string(),
             None => {
                 return Err(BifError {
-                    code: 10,
+                    code: 169,
                     msg: "arguments not found".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -2608,7 +2647,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_snippet(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_negate || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 170,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),
@@ -2633,7 +2672,7 @@ impl<'a> Bif<'a> {
                 return Ok(());
             } else {
                 return Err(BifError {
-                    code: 10,
+                    code: 171,
                     msg: "snippet cannot be set here".to_string(),
                     name: self.alias.clone(),
                     src: self.raw.to_string(),
@@ -2666,7 +2705,7 @@ impl<'a> Bif<'a> {
     fn parse_bif_trans(&mut self) -> Result<(), BifError> {
         if self.mod_filter || self.mod_scope {
             return Err(BifError {
-                code: 10,
+                code: 172,
                 msg: "modifier not allowed".to_string(),
                 name: self.alias.clone(),
                 src: self.raw.to_string(),

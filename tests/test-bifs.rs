@@ -4455,6 +4455,25 @@ fn test_bif_redirect_fails_no_params_2() {
     assert_eq!(template.get_status_param(), "");
     assert_eq!(result, "<div>ntsnts</div>");
 }
+#[test]
+fn test_get_errors() {
+    let mut template = match neutralts::Template::new() {
+        Ok(tpl) => tpl,
+        Err(error) => {
+            println!("Error creating Template: {}", error);
+            assert!(false);
+            return;
+        }
+    };
+    template.merge_schema_str(SCHEMA).unwrap();
+    template.set_src_str("<div>{:for; n :}{:allow: none :}</div>");
+    let result = template.render();
+    let errors = template.get_error();
+    assert_eq!(template.has_error(), true);
+    assert_eq!(errors[0], "Error 131 (for) arguments not found  src: {:for; n :}");
+    assert_eq!(errors[1], "The delimiter was not found: {:allow: none :}");
+    assert_eq!(result, "<div></div>");
+}
 
 #[test]
 fn test_bif_complete_tpl() {
