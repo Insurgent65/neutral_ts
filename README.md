@@ -45,6 +45,22 @@ It allows you to create templates compatible with any system and any programming
 * Exit with error: 403, 404, 503, ...
 * Comments
 
+How it works
+------------
+
+Neutral TS offers two main ways to integrate with other programming languages:
+
+* In Rust: You can use Neutral TS as a library by downloading the crate.
+
+* In other programming languages: Inter-Process Communication (IPC) is necessary, similar to how databases like MariaDB work.
+
+Imagine a database. It has a server, and different programming languages access the data through a client. This means that if you run a "SELECT ..." query from any programming language, the result will always be the same.
+
+Similarly, Neutral TS has an IPC server, and each programming language has a client. No matter where you run the template, the result will always be the same.
+
+Thanks to this, and to its modular and parameterizable design, it is possible to create utilities or plugins that will work everywhere. For example, you can develop tools to create forms or form fields and create your own libraries of "snippets" for repetitive tasks.
+
+
 Localization
 ------------
 
@@ -354,3 +370,4 @@ Python
 ------
 - [example](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/python)
 - [IPC client](https://gitlab.com/neutralfw/neutralts/-/tree/master/ipc/python)
+
