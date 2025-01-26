@@ -1,9 +1,0 @@
-{
-    "trans": {
-        "es": {
-            "test-locale": "Ok",
-            "Test {:;__test-nts:}": "Ok {:;__test-nts:}",
-            "num {:;n:} =": "num {:;n:} ="
-        }
-    }
-}
