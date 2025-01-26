@@ -1,9 +1,0 @@
-[package]
-name = "neutralts-actix"
-version = "0.0.0"
-edition = "2021"
-
-[dependencies]
-neutralts = { path = "../../" }
-actix-web = "4.0"
-serde_json = "1.0"
