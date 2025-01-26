@@ -1,13 +1,14 @@
-MOVE TO: 
-https://gitlab.com/neutralfw/neutralts
-======================================
-
-![neutral](doc/top-neutralts.png)
-
 Neutral Web Template System
 ===========================
 
 Neutral is a **web application template system**, designed to work with **any programming language** (language-agnostic) via IPC and natively as library/crate in Rust.
+
+In the examples, we use exactly the same template for both Rust and PHP:
+
+- [Rust example](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/actix)
+- [PHP example](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/php)
+- [Template](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/www)
+
 
 Safe
 ----
@@ -224,6 +225,9 @@ Template example
 ----------------
 
 ```html
+{:*
+    comment
+*:}
 {:locale; locale.json :}
 {:include; theme-snippets.ntpl :}
 <!DOCTYPE html>
@@ -336,6 +340,17 @@ Rust examples
 -------------
 
  - [actix-web](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/actix)
+ - [warp](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/warp)
  - [axum](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/actix)
  - [rocket](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/rocket)
  - [examples](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples)
+
+PHP
+---
+- [example](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/php)
+- [IPC client](https://gitlab.com/neutralfw/neutralts/-/tree/master/ipc/php)
+
+Python
+------
+- [example](https://gitlab.com/neutralfw/neutralts/-/tree/master/examples/python)
+- [IPC client](https://gitlab.com/neutralfw/neutralts/-/tree/master/ipc/python)
